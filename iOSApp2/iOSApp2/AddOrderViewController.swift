@@ -2,20 +2,20 @@ import UIKit
 
 // Protocol for AddToOrderViewController delegates
 protocol AddToOrderViewControllerDelegate: AnyObject {
-  func addToOrderViewControllerDidCancel(
-    _ controller: AddToOrderViewController)
-  func addToOrderViewController(
-    _ controller: AddToOrderViewController,
+  func addOrderViewControllerDidCancel(
+    _ controller: AddOrderViewController)
+  func addOrderViewController(
+    _ controller: AddOrderViewController,
     didFinishAdding item: OrderlistItem
   )
-  func addToOrderViewController(
-    _ controller: AddToOrderViewController,
+  func addOrderViewController(
+    _ controller: AddOrderViewController,
     didFinishEditing item: OrderlistItem
   )
 }
 
 // View controller for adding or editing order list items
-class AddToOrderViewController: UITableViewController, UITextFieldDelegate {
+class AddOrderViewController: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var textField: UITextField!
     
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
@@ -47,20 +47,20 @@ class AddToOrderViewController: UITableViewController, UITextFieldDelegate {
     // MARK: - Actions
     // Action for cancel button
     @IBAction func cancel() {
-      delegate?.addToOrderViewControllerDidCancel(self)
+      delegate?.addOrderViewControllerDidCancel(self)
     }
 
     // Action for done button
     @IBAction func done() {
       if let item = itemToEdit {
         item.text = textField.text!
-        delegate?.addToOrderViewController(
+        delegate?.addOrderViewController(
           self,
           didFinishEditing: item)
       } else {
         let item = OrderlistItem()
         item.text = textField.text!
-        delegate?.addToOrderViewController(self, didFinishAdding: item)
+        delegate?.addOrderViewController(self, didFinishAdding: item)
       }
     }
 

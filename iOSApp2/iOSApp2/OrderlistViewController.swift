@@ -9,38 +9,20 @@ import UIKit
 
 // Main view controller class for displaying the order list
 class OrderlistViewController: UITableViewController, AddToOrderViewControllerDelegate  {
-
-    // Array to hold order list items
-    var items = [OrderlistItem]()
     
+    var orderlist: Orderlist!
+
     // Method called after the view has been loaded
     override func viewDidLoad() {
       super.viewDidLoad()
-      navigationController?.navigationBar.prefersLargeTitles = true
-    
-    // Create initial order list items and add them to the items array
-      let item1 = OrderlistItem()
-      item1.text = "Medium Double Double"
-      items.append(item1)
-
-      let item2 = OrderlistItem()
-      item2.text = "Four Cheese Bagel"
-      item2.checked = true
-      items.append(item2)
-
-      let item3 = OrderlistItem()
-      item3.text = "Mocha Iced Cap"
-      item3.checked = true
-      items.append(item3)
-
-      let item4 = OrderlistItem()
-      item4.text = "Grilled Chicken Wrap"
-      items.append(item4)
-
-      let item5 = OrderlistItem()
-      item5.text = "Peach Quenchers"
-      items.append(item5)
+      
+      // Disable large titles for this view controller
+      navigationItem.largeTitleDisplayMode = .never
+      
+      // Set the title of the view controller to the order list name
+      title = orderlist.name
     }
+
 
     // Configure the checkmark for a given cell and item
     func configureCheckmark(
@@ -49,6 +31,7 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
     ) {
       let label = cell.viewWithTag(1001) as! UILabel
 
+      // Set the checkmark if the item is checked
       if item.checked {
         label.text = "√"
       } else {
@@ -65,14 +48,13 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
       label.text = item.text
     }
 
-
     // MARK: - Table View Data Source
     // Return the number of rows in the section
     override func tableView(
       _ tableView: UITableView,
       numberOfRowsInSection section: Int
     ) -> Int {
-      return items.count
+      return orderlist.items.count
     }
 
     // Configure and return the cell for a given index path
@@ -84,7 +66,7 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
         withIdentifier: "OrderlistItem",
         for: indexPath)
 
-      let item = items[indexPath.row]
+      let item = orderlist.items[indexPath.row]
 
       configureText(for: cell, with: item)
       configureCheckmark(for: cell, with: item)
@@ -98,7 +80,7 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
       didSelectRowAt indexPath: IndexPath
     ) {
       if let cell = tableView.cellForRow(at: indexPath) {
-        let item = items[indexPath.row]
+        let item = orderlist.items[indexPath.row]
         item.checked.toggle()
         configureCheckmark(for: cell, with: item)
       }
@@ -112,7 +94,7 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
       forRowAt indexPath: IndexPath
     ) {
       // 1. Remove the item from the data source
-      items.remove(at: indexPath.row)
+      orderlist.items.remove(at: indexPath.row)
 
       // 2. Delete the row from the table view
       let indexPaths = [indexPath]
@@ -124,19 +106,19 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
 
     // MARK: - Add Item ViewController Delegates
     // Handle the cancel action from AddToOrderViewController
-    func addToOrderViewControllerDidCancel(
-      _ controller: AddToOrderViewController
+    func addOrderViewControllerDidCancel(
+      _ controller: AddOrderViewController
     ) {
       navigationController?.popViewController(animated: true)
     }
 
     // Handle adding a new item from AddToOrderViewController
-    func addToOrderViewController(
-      _ controller: AddToOrderViewController,
+    func addOrderViewController(
+      _ controller: AddOrderViewController,
       didFinishAdding item: OrderlistItem
     ) {
-      let newRowIndex = items.count
-      items.append(item)
+      let newRowIndex = orderlist.items.count
+      orderlist.items.append(item)
 
       let indexPath = IndexPath(row: newRowIndex, section: 0)
       let indexPaths = [indexPath]
@@ -145,11 +127,11 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
     }
     
     // Handle editing an existing item from AddToOrderViewController
-    func addToOrderViewController(
-      _ controller: AddToOrderViewController,
+    func addOrderViewController(
+      _ controller: AddOrderViewController,
       didFinishEditing item: OrderlistItem
     ) {
-      if let index = items.firstIndex(of: item) {
+      if let index = orderlist.items.firstIndex(of: item) {
         let indexPath = IndexPath(row: index, section: 0)
         if let cell = tableView.cellForRow(at: indexPath) {
           configureText(for: cell, with: item)
@@ -157,7 +139,6 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
       }
       navigationController?.popViewController(animated: true)
     }
-
 
     // MARK: - Navigation
     // Prepare for the segue to AddToOrderViewController
@@ -168,16 +149,16 @@ class OrderlistViewController: UITableViewController, AddToOrderViewControllerDe
       // 1. Check the identifier of the segue
       if segue.identifier == "AddItem" {
         // 2. Get the destination view controller
-        let controller = segue.destination as! AddToOrderViewController
+        let controller = segue.destination as! AddOrderViewController
         // 3. Set the delegate to self
         controller.delegate = self
       } else if segue.identifier == "EditItem" {
-          let controller = segue.destination as! AddToOrderViewController
+          let controller = segue.destination as! AddOrderViewController
           controller.delegate = self
 
           if let indexPath = tableView.indexPath(
             for: sender as! UITableViewCell) {
-            controller.itemToEdit = items[indexPath.row]
+            controller.itemToEdit = orderlist.items[indexPath.row]
           }
         }
       }

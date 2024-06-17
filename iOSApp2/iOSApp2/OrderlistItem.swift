@@ -8,9 +8,12 @@
 import Foundation
 
 // Class representing an item in the order list
-class OrderlistItem: NSObject {
+class OrderlistItem: NSObject, Codable  {
 
+  // The text description of the order list item
   var text = ""
+    
+  // Boolean indicating whether the item is checked
   var checked = false
 }
 
